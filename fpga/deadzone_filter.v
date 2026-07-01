@@ -7,9 +7,9 @@ module deadzone_filter (
 
     always @(*) begin
         if (raw_axis > DEADZONE) begin
-            filtered_axis = (raw_axis - DEADZONE) * $signed({6'b0}, dpi_multiplier);
+            filtered_axis = (raw_axis - DEADZONE) * $signed({6'b0, dpi_multiplier});
         end else if (raw_axis < -DEADZONE) begin
-            filtered_axis = (raw_axis + DEADZONE) * $signed({6'b0}, dpi_multiplier);
+            filtered_axis = (raw_axis + DEADZONE) * $signed({6'b0, dpi_multiplier});
         end else begin
             filtered_axis = 8'sd0;
         end
