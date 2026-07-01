@@ -12,6 +12,8 @@ module deadzone_filter_tb;
     );
 
     initial begin
+        $dumpfile("deadzone_filter_tb.vcd");
+        $dumpvars(0, deadzone_filter_tb);
         $monitor("Time = %0t | Raw = %d | DPI_Multiplier = %d | Filtered = %d", $time, raw_axis, dpi_multiplier, filtered_axis);
 
         dpi_multiplier = 2'b01;
