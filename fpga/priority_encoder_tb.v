@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module tb_priority_encoder;
+module priority_encoder_tb;
 
     reg [3:0] r_buttons;
     wire [1:0] w_encoded_val;
@@ -13,8 +13,8 @@ module tb_priority_encoder;
     );
 
     initial begin
-        $dumpfile("tb_priority_encoder.vcd");
-        $dumpvars(0, tb_priority_encoder);
+        $dumpfile("priority_encoder_tb.vcd");
+        $dumpvars(0, priority_encoder_tb);
 
         // Estado inicial de repouso: todas as entradas em nível lógico baixo
         r_buttons = 4'b0000;
