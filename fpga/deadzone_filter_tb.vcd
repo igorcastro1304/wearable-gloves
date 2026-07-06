@@ -1,0 +1,63 @@
+$date
+	Wed Jul  1 15:13:40 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module deadzone_filter_tb $end
+$var wire 8 ! filtered_axis [7:0] $end
+$var reg 2 " dpi_multiplier [1:0] $end
+$var reg 8 # raw_axis [7:0] $end
+$scope module uut $end
+$var wire 2 $ dpi_multiplier [1:0] $end
+$var wire 8 % raw_axis [7:0] $end
+$var parameter 8 & DEADZONE $end
+$var reg 8 ' filtered_axis [7:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b1000 &
+$end
+#0
+$dumpvars
+b0 '
+b101 %
+b1 $
+b101 #
+b1 "
+b0 !
+$end
+#10000
+b11111100 #
+b11111100 %
+#20000
+b0 #
+b0 %
+#30000
+b100 !
+b100 '
+b1100 #
+b1100 %
+#40000
+b11111100 !
+b11111100 '
+b11110100 #
+b11110100 %
+#50000
+b1000 !
+b1000 '
+b1100 #
+b1100 %
+b10 "
+b10 $
+#60000
+b11111000 !
+b11111000 '
+b11110100 #
+b11110100 %
+#70000

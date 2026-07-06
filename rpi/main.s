@@ -1,23 +1,54 @@
-// Programa Assembly ARM64 de Teste de Inicialização do Periférico HID
-// Projetado para montagem nativa utilizando GCC/GAS no Raspberry Pi OS (Debian 64-bit)
+.extern i2c_setup
+.extern hid_setup
+.extern movement_processment
+.extern axis_cleanup
+
+.section .rodata
+timespec_delay:
+	.quad 0
+	.quad 20000000
+
 .global _start
-
-.section .data
-/* Seção de dados estáticos pré-alocados em memória RAM */
-msg_prompt:
-   .ascii "Testando Inicializacao do Barramento HID no Raspberry Pi...\n"
-len_prompt =. - msg_prompt
-
 .section .text
-_start:
-    /* Execução da Chamada de Sistema: sys_write (ID #64) */
-    mov     x0, #1
-    ldr     x1, =msg_prompt
-    ldr     x2, =len_prompt
-    mov     x8, #64
-    svc     #0
 
-    /* Execução da Chamada de Sistema: sys_exit (ID #93) */
-    mov     x0, #0
-    mov     x8, #93
-    svc     #0
+_start:
+	bl i2c_setup
+	mov x19, x0
+	cmp x19, #0
+	blt error_exit
+
+	bl hid_setup
+	mov x20, x0
+	cmp x20, #0
+	blt error_exit
+
+	mov x21, #1000
+
+main_loop:
+	cbz x21, cleanup_exit
+
+	mov x0, x19
+	mov x1, x20
+	bl movement_processment
+	cmp x0, #0
+	blt cleanup_exit
+
+	adrp x0, timespec_delay
+	add x0, x0, :lo12:timespec_delay
+	mov x1, #0
+	mov x8, #101
+	svc #0
+
+	sub x21, x21, #1
+	b main_loop
+
+cleanup_exit:
+	mov x0, x19
+	mov x1, x20
+	bl axis_cleanup
+
+error_exit:
+	mov w0, #0
+	mov x8, #93
+	svc #0
+
