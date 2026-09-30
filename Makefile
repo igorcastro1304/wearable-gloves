@@ -153,8 +153,7 @@ endif
 
 test-fifo: all
 ifeq ($(ARCH),aarch64)
-	rm -f $(FIFO) && mkfifo $(FIFO)
-	sudo sh -c '$(TARGET) $(FIFO) & pid=$$!; sleep 1; $(FAKE) > $(FIFO); sleep 1; kill $$pid; wait $$pid'
+	sudo sh -c 'rm -f $(FIFO); mkfifo $(FIFO); $(TARGET) $(FIFO) & pid=$$!; sleep 1; $(FAKE) > $(FIFO); sleep 1; kill $$pid; wait $$pid; rm -f $(FIFO)'
 else
 	@echo "make test-fifo so funciona no Raspberry Pi (aarch64). No PC use: make qemu-test"
 endif
