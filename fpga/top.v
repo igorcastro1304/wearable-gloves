@@ -16,9 +16,7 @@ module top (
     output wire uart_txd
 );
     localparam signed [15:0] DEADZONE_LSB = 16'sd2000;
-
     localparam [8:0] ALPHA_Q8 = 9'd64;
-
     localparam LED_ACTIVE_LOW = 1'b0;
 
     reg [15:0] por_cnt  = 16'd0;
@@ -99,17 +97,17 @@ module top (
     debounce #(.CLK_FREQ(27_000_000), .MS(10), .ACTIVE_LOW(1)) u_db_dpi   (.clk(clk), .rst(rst), .din(btn_dpi),   .pressed(dpi_pressed),   .pressed_rise(dpi_rise));
     debounce #(.CLK_FREQ(27_000_000), .MS(10), .ACTIVE_LOW(1)) u_db_hand  (.clk(clk), .rst(rst), .din(sw_hand),   .pressed(hand_left),     .pressed_rise(hand_rise));
 
-//    reg [22:0] refresh_cnt;
-//    always @(posedge clk or posedge rst) begin
-//        if (rst) refresh_cnt <= 23'd0;
-//        else     refresh_cnt <= refresh_cnt + 23'd1;
-//    end
+    reg hand_toggle;
+    always @(posedge clk or posedge rst) begin
+        if (rst)            hand_toggle <= 1'b0;
+        else if (hand_rise) hand_toggle <= ~hand_toggle;
+    end
 
-     reg [22:0] refresh_cnt;
-     always @(posedge clk or posedge rst) begin
-         if (rst) refresh_cnt <= 23'd0;
-         else     refresh_cnt <= refresh_cnt + 23'd1;
-     end
+    reg [22:0] refresh_cnt;
+    always @(posedge clk or posedge rst) begin
+        if (rst) refresh_cnt <= 23'd0;
+        else     refresh_cnt <= refresh_cnt + 23'd1;
+    end
     wire refresh_tick = &refresh_cnt;
 
     wire [1:0] btn_state = {right_pressed, left_pressed};
@@ -121,14 +119,12 @@ module top (
             hand_d      <= 1'b0;
         end else begin
             btn_state_d <= btn_state;
-//            hand_d      <= hand_left;
-            hand_d <= hand_toggle;
+            hand_d      <= hand_toggle;
         end
     end
 
     wire btn_pulse  = (btn_state != btn_state_d) | refresh_tick;
-//    wire hand_pulse = (hand_left != hand_d)      | refresh_tick;
-    wire hand_pulse = (hand_toggle != hand_d) | refresh_tick;
+    wire hand_pulse = (hand_toggle != hand_d)    | refresh_tick;
 
     pkt_sender #(.CLK_FREQ(27_000_000), .BAUD(115200)) u_pkt (
         .clk(clk),
@@ -139,14 +135,12 @@ module top (
         .btn_pulse(btn_pulse),
         .btn_state(btn_state),
         .hand_pulse(hand_pulse),
-//        .hand_state(hand_left),
         .hand_state(hand_toggle),
         .dpi_pulse(dpi_rise),
         .tx(uart_txd)
     );
 
-    wire led_mov_on = imu_data_valid & (final_x != 32'sd0 | final_y != 32'sd0);
-
+    wire led_mov_on = imu_data_valid & ((final_x != 32'sd0) | (final_y != 32'sd0));
     assign led_mov = LED_ACTIVE_LOW ? ~led_mov_on : led_mov_on;
 
     reg [24:0] hb_cnt;
